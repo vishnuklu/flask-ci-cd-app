@@ -1,44 +1,54 @@
 pipeline {
     agent any
-
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing dependencies...'
+                sh 'pip3 install -r requirements.txt'  // Ensure dependencies are installed
+            }
+        }
+
         stage('Build') {
             steps {
                 echo 'Building...'
             }
         }
+
         stage('Test') {
             steps {
                 echo 'Running tests...'
                 script {
                     try {
                         // Run the Flask app
-                        sh 'python3 app.py'  // Make sure the Python3 command is used
+                        sh 'python3 app.py'  // Run app.py with python3
                     } catch (Exception e) {
-                        // Mark the build as FAILURE if an exception occurs
-                        currentBuild.result = 'FAILURE'  // Set build result to FAILURE
-                        throw e  // Propagate the error to Jenkins to fail the build
+                        currentBuild.result = 'FAILURE'  // Mark build as FAILURE
+                        throw e  // Propagate the error
                     }
                 }
             }
         }
+
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
             }
         }
-    }
 
-    post {
-        success {
-            emailext to: 'cmvishnubabu08@gmail.com',
-                subject: "Build Success: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                body: "Good news! Build was successful."
-        }
-        failure {
-            emailext to: 'cmvishnubabu08@gmail.com',
-                subject: "Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                body: "Unfortunately, the build failed due to an error in the application. Please check the console output for details."
+        stage('Post Actions') {
+            steps {
+                emailext(
+                    subject: "Build failed for ${JOB_NAME}",
+                    body: "The build has failed. Please check the logs for more details.",
+                    to: "cmvishnubabu08@gmail.com"
+                )
+            }
         }
     }
 }
