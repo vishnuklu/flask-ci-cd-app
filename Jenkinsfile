@@ -12,7 +12,10 @@ pipeline {
                 echo 'Running tests...'
                 script {
                     try {
-                        // Attempt to run the Flask app using python3
+                        // Install the necessary Python packages, including Flask
+                        sh 'pip3 install -r requirements.txt'  // Ensure you have a requirements.txt file
+
+                        // Run the Flask app
                         sh 'python3 app.py'
                     } catch (Exception e) {
                         // Mark the build as failure and send failure email
