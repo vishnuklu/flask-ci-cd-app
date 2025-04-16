@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Change these to match your environment
         EMAIL_RECIPIENT = 'cmvishnubabu08@gmail.com'
     }
 
@@ -10,52 +9,59 @@ pipeline {
         stage('Clone Repo') {
             steps {
                 git 'https://github.com/vishnuklu/flask-ci-cd-app.git'
-
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Set Up Virtualenv and Install Requirements') {
             steps {
-                sh 'pip install -r requirements.txt'
+                script {
+                    sh 'python3 -m venv venv'
+                    sh './venv/bin/pip install -r requirements.txt'
+                }
             }
         }
 
         stage('Run Flask App') {
             steps {
-                sh 'python app.py &'
+                sh './venv/bin/python app.py &'
+                sleep 5 // wait for server to start
             }
         }
 
-        stage('Run Tests') {
+        stage('Tests') {
             steps {
-                // Optional: Add test scripts here
-                echo "✅ All tests passed (placeholder)"
+                echo "✅ Test placeholder"
             }
         }
     }
 
     post {
         success {
-            emailext subject: "✅ SUCCESS: Build #${env.BUILD_NUMBER} - ${env.JOB_NAME}",
-                     body: """
-                        <h3>✅ Build Successful</h3>
-                        <p>Build Number: ${env.BUILD_NUMBER}</p>
-                        <p>Project: ${env.JOB_NAME}</p>
-                        <p><a href="${env.BUILD_URL}">View Build</a></p>
-                     """,
-                     to: "${EMAIL_RECIPIENT}",
-                     mimeType: 'text/html'
+            emailext(
+                subject: "✅ SUCCESS: Build #${env.BUILD_NUMBER}",
+                body: """
+                    <h2>✅ Build Successful</h2>
+                    <p><b>Job:</b> ${env.JOB_NAME}</p>
+                    <p><b>Build #:</b> ${env.BUILD_NUMBER}</p>
+                    <p><b>URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """,
+                to: "${EMAIL_RECIPIENT}",
+                mimeType: 'text/html'
+            )
         }
+
         failure {
-            emailext subject: "❌ FAILURE: Build #${env.BUILD_NUMBER} - ${env.JOB_NAME}",
-                     body: """
-                        <h3>❌ Build Failed</h3>
-                        <p>Build Number: ${env.BUILD_NUMBER}</p>
-                        <p>Project: ${env.JOB_NAME}</p>
-                        <p><a href="${env.BUILD_URL}">View Build</a></p>
-                     """,
-                     to: "${EMAIL_RECIPIENT}",
-                     mimeType: 'text/html'
+            emailext(
+                subject: "❌ FAILED: Build #${env.BUILD_NUMBER}",
+                body: """
+                    <h2>❌ Build Failed</h2>
+                    <p><b>Job:</b> ${env.JOB_NAME}</p>
+                    <p><b>Build #:</b> ${env.BUILD_NUMBER}</p>
+                    <p><b>URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """,
+                to: "${EMAIL_RECIPIENT}",
+                mimeType: 'text/html'
+            )
         }
     }
 }
