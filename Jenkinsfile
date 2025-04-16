@@ -1,31 +1,34 @@
- {
+pipeline {
     agent any
 
     stages {
         stage('Build') {
             steps {
                 echo 'Building...'
-                sh 'echo "Build step completed successfully."' // Now succeeds
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
             }
         }
     }
 
     post {
         success {
-            emailext (
-                subject: "\u2705 Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """<p>Good news! The build was successful.</p>
-                         <p>Job: ${env.JOB_NAME}<br>Build: #${env.BUILD_NUMBER}</p>""",
-                to: 'cmvishnubabu08@gmail.com'
-            )
+            emailext to: 'cmvishnubabu08@gmail.com.com',
+                subject: "Build Success: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: "Good news! Build was successful."
         }
         failure {
-            emailext (
-                subject: "\u274c Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """<p>Oops! The build failed.</p>
-                         <p>Job: ${env.JOB_NAME}<br>Build: #${env.BUILD_NUMBER}</p>""",
-                to: 'cmvishnubabu08@gmail.com'
-            )
+            emailext to: 'cmvishnubabu08@gmail.com',
+                subject: "Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: "Unfortunately, the build failed. Please check the console output."
         }
     }
 }
