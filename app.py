@@ -4,11 +4,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return 'Hello, World!'
+    # Simulating an error (divide by zero)
+    result = 1 / 0  # This will cause a ZeroDivisionError
+    return f"Result: {result}"
 
-@app.route('/new_route')
-def new_route():
-    return 'This is a new route.'
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
