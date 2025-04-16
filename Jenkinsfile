@@ -9,11 +9,8 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                echo 'Setting up virtual environment and installing dependencies...'
-                // Create a virtual environment in the workspace
-                sh 'python3 -m venv venv'
-                // Activate the virtual environment and install dependencies
-                sh './venv/bin/pip install -r requirements.txt'
+                echo 'Installing dependencies with pipx...'
+                sh 'pipx install -r requirements.txt'  // Using pipx to handle dependencies
             }
         }
 
@@ -28,8 +25,8 @@ pipeline {
                 echo 'Running tests...'
                 script {
                     try {
-                        // Run the Flask app using the virtual environment's Python
-                        sh './venv/bin/python app.py'  // Run app.py with virtual environment's python
+                        // Run the Flask app with pipx-managed Python
+                        sh 'pipx run python3 app.py'  // Using pipx to run app.py
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'  // Mark build as FAILURE
                         throw e  // Propagate the error
