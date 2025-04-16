@@ -2,11 +2,13 @@ from flask import Flask
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route('/')
 def home():
-    return "Hello, Flask from PyCharm!"
+    return 'Hello, World!'
+
+@app.route('/new_route')
+def new_route():
+    return 'This is a new route.'
 
 if __name__ == '__main__':
-    import os
-    port = int(os.environ.get('PORT', 5000))  # Get port from environment
-    app.run(host='0.0.0.0', port=port, debug=True)  # Bind to 0.0.0.0
+    app.run(debug=True)
