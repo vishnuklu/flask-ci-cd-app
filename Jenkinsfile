@@ -9,8 +9,11 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies with pipx...'
-                sh 'pipx install -r requirements.txt'  // Using pipx to handle dependencies
+                echo 'Installing dependencies globally...'
+                script {
+                    // Install dependencies globally using pip3
+                    sh 'pip3 install -r requirements.txt'
+                }
             }
         }
 
@@ -25,8 +28,8 @@ pipeline {
                 echo 'Running tests...'
                 script {
                     try {
-                        // Run the Flask app with pipx-managed Python
-                        sh 'pipx run python3 app.py'  // Using pipx to run app.py
+                        // Run the Flask app using the global Python
+                        sh 'python3 app.py'  // Run app.py with python3
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'  // Mark build as FAILURE
                         throw e  // Propagate the error
