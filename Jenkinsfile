@@ -12,15 +12,12 @@ pipeline {
                 echo 'Running tests...'
                 script {
                     try {
-                        // Install the necessary Python packages, including Flask
-                        sh 'pip3 install -r requirements.txt'  // Ensure you have a requirements.txt file
-
                         // Run the Flask app
-                        sh 'python3 app.py'
+                        sh 'python3 app.py'  // Make sure the Python3 command is used
                     } catch (Exception e) {
-                        // Mark the build as failure and send failure email
-                        currentBuild.result = 'FAILURE'  // Set build result as FAILURE
-                        throw e  // Propagate the error to Jenkins
+                        // Mark the build as FAILURE if an exception occurs
+                        currentBuild.result = 'FAILURE'  // Set build result to FAILURE
+                        throw e  // Propagate the error to Jenkins to fail the build
                     }
                 }
             }
@@ -41,7 +38,7 @@ pipeline {
         failure {
             emailext to: 'cmvishnubabu08@gmail.com',
                 subject: "Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                body: "Unfortunately, the build failed. Please check the console output."
+                body: "Unfortunately, the build failed due to an error in the application. Please check the console output for details."
         }
     }
 }
