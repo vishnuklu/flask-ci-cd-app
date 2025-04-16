@@ -1,18 +1,31 @@
-post {
-    success {
-        echo 'Build succeeded!'
-        emailext (
-            subject: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: "Good job! The build succeeded.\nCheck it here: ${env.BUILD_URL}",
-            to: 'cmvishnubabu08@gmail.com'
-        )
+ {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+                sh 'echo "Build step completed successfully."' // Now succeeds
+            }
+        }
     }
-    failure {
-        echo 'Build failed!'
-        emailext (
-            subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: "The build failed. Check it here: ${env.BUILD_URL}",
-            to: 'cmvishnubabu08@gmail.com'
-        )
+
+    post {
+        success {
+            emailext (
+                subject: "\u2705 Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """<p>Good news! The build was successful.</p>
+                         <p>Job: ${env.JOB_NAME}<br>Build: #${env.BUILD_NUMBER}</p>""",
+                to: 'cmvishnubabu08@gmail.com'
+            )
+        }
+        failure {
+            emailext (
+                subject: "\u274c Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """<p>Oops! The build failed.</p>
+                         <p>Job: ${env.JOB_NAME}<br>Build: #${env.BUILD_NUMBER}</p>""",
+                to: 'cmvishnubabu08@gmail.com'
+            )
+        }
     }
 }
