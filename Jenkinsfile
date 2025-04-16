@@ -9,8 +9,11 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies...'
-                sh 'pip3 install -r requirements.txt'  // Ensure dependencies are installed
+                echo 'Setting up virtual environment and installing dependencies...'
+                // Create a virtual environment in the workspace
+                sh 'python3 -m venv venv'
+                // Activate the virtual environment and install dependencies
+                sh './venv/bin/pip install -r requirements.txt'
             }
         }
 
@@ -25,8 +28,8 @@ pipeline {
                 echo 'Running tests...'
                 script {
                     try {
-                        // Run the Flask app
-                        sh 'python3 app.py'  // Run app.py with python3
+                        // Run the Flask app using the virtual environment's Python
+                        sh './venv/bin/python app.py'  // Run app.py with virtual environment's python
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'  // Mark build as FAILURE
                         throw e  // Propagate the error
