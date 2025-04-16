@@ -9,7 +9,16 @@ pipeline {
         }
         stage('Test') {
             steps {
-                echo 'Testing...'
+                echo 'Running tests...'
+                script {
+                    try {
+                        // Run Flask app which will fail due to ZeroDivisionError
+                        sh 'python app.py'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'  // Mark the build as failure
+                        throw e  // Re-throw the error to propagate the failure
+                    }
+                }
             }
         }
         stage('Deploy') {
