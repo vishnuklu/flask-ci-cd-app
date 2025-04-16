@@ -12,11 +12,12 @@ pipeline {
                 echo 'Running tests...'
                 script {
                     try {
-                        // Run Flask app which will fail due to ZeroDivisionError
-                        sh 'python app.py'
+                        // Attempt to run the Flask app using python3
+                        sh 'python3 app.py'
                     } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'  // Mark the build as failure
-                        throw e  // Re-throw the error to propagate the failure
+                        // Mark the build as failure and send failure email
+                        currentBuild.result = 'FAILURE'  // Set build result as FAILURE
+                        throw e  // Propagate the error to Jenkins
                     }
                 }
             }
